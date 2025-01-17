@@ -1,0 +1,1 @@
+Dans ce script, je vais essayé de créé un script permettant d'afficher dans un serveur discord des annonces Vinted selon des critères spécifiques (marque, prix, couleur ...). J'utilise RapidAPI pour récupéré les données de Vinted.
