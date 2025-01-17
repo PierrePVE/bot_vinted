@@ -2,7 +2,7 @@ import requests
 
 url = "https://vinted3.p.rapidapi.com/getSearch"
 
-querystring = {"country":"fr","page":"1","keyword":"pantalon pyjama","brands":"88","order":"newest_first","minPrice":"0","maxPrice":"20"}
+querystring = {"country":"fr","page":"1","keyword":"casquette","brands":"88","order":"newest_first","minPrice":"0","maxPrice":"20"}
 
 headers = {
 	"x-rapidapi-key": "bd1b37c9aemsh59620ec548b7985p1597eajsn8ad074fb20b0",
