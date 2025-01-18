@@ -1,4 +1,6 @@
 import time
+import json
+
 from typing import Dict, Optional
 from VintedWrapper import VintedWrapper
 from VintedScraper import VintedScraper
@@ -7,10 +9,14 @@ from VintedScraper import VintedScraper
 def search_and_display_new_items(scraper, search_params, seen_items):
     """
     Fonction pour rechercher de nouveaux articles et afficher les résultats non vus.
+    Retourne un JSON avec tous les items trouvés.
     """
     print("Requête en cours...")
     items = scraper.search(params=search_params)
     new_items_found = False
+
+    # Liste pour stocker les articles trouvés
+    new_items = []
 
     for item in items:
         item_url = item.url if item.url else 'No URL found'
@@ -25,15 +31,20 @@ def search_and_display_new_items(scraper, search_params, seen_items):
             image_url = item.photos[0].url if item.photos else 'No image available'
             brand_name = item.brand.title if item.brand else 'No brand available'
 
-            # Affichage formaté
-            print(f"Nom de l'article: {title}")
-            print(f"URL de l'article: {item_url}")
-            print(f"URL de l'image: {image_url}")
-            print(f"Nom de la marque: {brand_name}")
-            print('-' * 50)
+            # Ajouter l'article trouvé à la liste
+            new_items.append({
+                "title": title,
+                "url": item_url,
+                "image_url": image_url,
+                "brand_name": brand_name
+            })
 
     if not new_items_found:
         print("Aucun nouvel article trouvé.")
+        return {}
+
+    # Retourner un JSON avec tous les articles trouvés
+    return json.dumps({"new_items": new_items}, indent=4)
 
 
 def main(search_text: str, price_from: Optional[int] = None, price_to: Optional[int] = None, interval: int = 30):
@@ -71,24 +82,11 @@ def main(search_text: str, price_from: Optional[int] = None, price_to: Optional[
     # Boucle pour exécuter des requêtes toutes les x secondes
     try:
         while True:
-            search_and_display_new_items(scraper, search_params, seen_items)
+            result_json = search_and_display_new_items(scraper, search_params, seen_items)
+            
+            # Si des éléments sont trouvés, on les retourne
+            if result_json:
+                yield result_json            
             time.sleep(interval)
     except KeyboardInterrupt:
         print("Arrêt du programme.")
-
-
-if __name__ == "__main__":
-    # Exemple d'utilisation : ces valeurs peuvent être saisies dynamiquement
-    search_text = input("Entrez les mots-clés de recherche : ")
-
-    # Les prix sont optionnels
-    price_from = input("Entrez le prix minimum (en euros, laisser vide si non applicable) : ")
-    price_to = input("Entrez le prix maximum (en euros, laisser vide si non applicable) : ")
-
-    # Convertir les valeurs en entiers ou les laisser à None si vide
-    price_from = int(price_from) if price_from.strip() else None
-    price_to = int(price_to) if price_to.strip() else None
-
-    interval = int(input("Entrez l'intervalle en secondes entre les recherches : "))
-
-    main(search_text, price_from, price_to, interval)
