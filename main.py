@@ -1,5 +1,6 @@
 import time
 import json
+import asyncio
 
 from typing import Dict, Optional
 from VintedWrapper import VintedWrapper
@@ -47,7 +48,7 @@ def search_and_display_new_items(scraper, search_params, seen_items):
     return json.dumps({"new_items": new_items}, indent=4)
 
 
-def main(search_text: str, price_from: Optional[int] = None, price_to: Optional[int] = None, interval: int = 30):
+async def main(search_text: str, price_from: Optional[int] = None, price_to: Optional[int] = None, interval: int = 30):
     """
     Fonction principale qui initialise le scraper et exécute la recherche en boucle.
 
@@ -87,6 +88,36 @@ def main(search_text: str, price_from: Optional[int] = None, price_to: Optional[
             # Si des éléments sont trouvés, on les retourne
             if result_json:
                 yield result_json            
-            time.sleep(interval)
+            await asyncio.sleep(interval)   
     except KeyboardInterrupt:
         print("Arrêt du programme.")
+
+
+def test():
+    # Configuration de base
+    base_url = "https://www.vinted.fr"  # Remplace par le bon domaine pour ton pays
+    user_agent = None  # Utilise un agent aléatoire si None
+    session_cookie = None  # Laisse à None si tu veux que le cookie soit généré automatiquement
+    proxies: Dict = {}  # Exemple : {"http": "http://proxy:port", "https": "https://proxy:port"} si nécessaire
+
+    # Initialisation du scraper
+    scraper = VintedScraper(baseurl=base_url, agent=user_agent, session_cookie=session_cookie, proxies=proxies)
+    search_params = {
+        "brand": "Nike",
+        "size": "M",
+        "price_max": 50
+    }
+    seen_items = set()
+
+    # Appel de la fonction pour rechercher les nouveaux articles
+    result_json = search_and_display_new_items(scraper, search_params, seen_items)       
+
+        # Charger le JSON en tant que dictionnaire Python
+    result_data = json.loads(result_json)
+
+    # Accéder à la liste des nouveaux articles
+    new_items = result_data.get("new_items", []) 
+
+    print(new_items)
+
+test()

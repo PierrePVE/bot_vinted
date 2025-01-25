@@ -48,8 +48,8 @@ async def on_ready():
 
     # Paramètres de recherche
     search_text = "Pantalon de pyjama Ralph Lauren"
-    price_from = 15
-    price_to = 50
+    price_from = 20
+    price_to = 40
     interval = 30  # Intervalle de 30 secondes entre chaque recherche
 
     # Appeler la fonction main() pour récupérer les articles
@@ -57,8 +57,19 @@ async def on_ready():
 
     # Itérer sur le générateur avec une boucle classique
     try:
-        for listJSON in generator:
+        async for listJSON in generator:
             item_data = json.loads(listJSON)  # Convertir le JSON en dictionnaire
+
+            # Afficher proprement chaque article
+            print("\nNouvel article détecté :")
+            for item in item_data['new_items']:
+                print(f"  - **Titre :** {item.get('title', 'N/A')}")
+                print(f"    **URL :** {item.get('url', 'N/A')}")
+                print(f"    **Image :** {item.get('image_url', 'N/A')}")
+                print(f"    **Marque :** {item.get('brand_name', 'N/A')}")
+                print(f"    **Prix :** {item.get('price', 'N/A')}")
+                print("-" * 40)  # Ligne de séparation pour plus de clarté
+
             await send_item_message(channel, item_data)  # Envoyer les informations des items
     except KeyboardInterrupt:
         print("Programme interrompu.")
